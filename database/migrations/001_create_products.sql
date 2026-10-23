@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `products` (
-    `id` int NOT NULL,
+    `id` int AUTO_INCREMENT PRIMARY KEY,
     `name` varchar(255) NOT NULL,
     `description` text,
     `price` decimal(10, 2) NOT NULL,
