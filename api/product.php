@@ -3,9 +3,26 @@ header('Content-Type: application/json');
 require __DIR__ . '/../config/db.php';
 require __DIR__ . '/../src/QueryDb.php';
 
+// if i want to send as a form body as well
+
+function getBody()
+{
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true);
+    if (is_array($data)) {
+        return $data;
+    }
+    // check if $_POST was polutated
+    if (!empty($_POST)) {
+        return $_POST;
+    }
+    // fallback for PUT/PATCH urlencoded bodies
+    parse_str($raw, $data);
+    return is_array($data) ? $data : [];
+}
 // creating all products
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = getBody();
 
     //write sql query for insertion
     $sql = 'SELECT id FROM products WHERE name = ? LIMIT 1';
@@ -84,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         exit();
     }
 
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = getBody();
 
     $sql = 'SELECT id FROM products WHERE id = ?';
     $stmt = $pdo->prepare($sql);
@@ -135,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
         ]);
         exit();
     }
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = getBody();
     $allowed = ['name', 'description', 'price', 'stock'];
     if (!is_array($data)) {
         http_response_code(400);
