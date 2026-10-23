@@ -85,3 +85,18 @@ class QueryDb
         }
     }
 }
+function getBody()
+{
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true);
+    if (is_array($data)) {
+        return $data;
+    }
+    // check if $_POST was polutated
+    if (!empty($_POST)) {
+        return $_POST;
+    }
+    // fallback for PUT/PATCH urlencoded bodies
+    parse_str($raw, $data);
+    return is_array($data) ? $data : [];
+}
